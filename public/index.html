@@ -1,0 +1,3919 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieLAB Admin - API 연동 버전</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+/* ========================================
+   MovieLAB Admin - Dark Premium Theme
+   ======================================== */
+
+:root {
+    /* 다크 프리미엄 컬러 팔레트 */
+    --bg-primary: #0a0a0a;
+    --bg-secondary: #141414;
+    --bg-tertiary: #1a1a1a;
+    --bg-hover: #222222;
+    
+    --text-primary: #ffffff;
+    --text-secondary: #b3b3b3;
+    --text-tertiary: #808080;
+    
+    --accent-blue: #3b82f6;
+    --accent-green: #10b981;
+    --accent-purple: #8b5cf6;
+    --accent-orange: #f59e0b;
+    --accent-red: #ef4444;
+    
+    --border-color: #2a2a2a;
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+    
+    --sidebar-width: 260px;
+    --header-height: 64px;
+    
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.3s ease;
+}
+
+/* 기본 리셋 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+/* 사이드바 */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    transition: transform var(--transition-normal);
+}
+
+.sidebar-header {
+    padding: 24px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.logo-subtitle {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 0;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.nav-list {
+    list-style: none;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.nav-item.active {
+    background: var(--bg-tertiary);
+    color: var(--accent-blue);
+    border-left: 3px solid var(--accent-blue);
+    padding-left: 17px;
+}
+
+.nav-item i {
+    width: 20px;
+    font-size: 16px;
+}
+
+.sidebar-footer {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.admin-profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid var(--border-color);
+}
+
+.admin-info {
+    flex: 1;
+}
+
+.admin-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.admin-role {
+    font-size: 11px;
+    color: var(--text-tertiary);
+}
+
+.btn-logout {
+    width: 100%;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all var(--transition-fast);
+}
+
+.btn-logout:hover {
+    background: var(--bg-hover);
+    color: var(--accent-red);
+    border-color: var(--accent-red);
+}
+
+/* 메인 컨텐츠 */
+.main-content {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    padding-top: var(--header-height);
+}
+
+.top-header {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-width);
+    right: 0;
+    height: var(--header-height);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    z-index: 900;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-menu-toggle {
+    display: none;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: background var(--transition-fast);
+}
+
+.btn-menu-toggle:hover {
+    background: var(--bg-hover);
+}
+
+.page-title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.header-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.header-search i {
+    position: absolute;
+    left: 12px;
+    color: var(--text-tertiary);
+    font-size: 14px;
+}
+
+.header-search input {
+    padding: 8px 12px 8px 36px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    width: 280px;
+    transition: all var(--transition-fast);
+}
+
+.header-search input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    background: var(--bg-hover);
+}
+
+.btn-notification {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all var(--transition-fast);
+}
+
+.btn-notification:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.notification-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 18px;
+    height: 18px;
+    background: var(--accent-red);
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 페이지 컨텐츠 */
+.page-content {
+    display: none;
+    padding: 32px;
+    animation: fadeIn 0.3s ease;
+}
+
+.page-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 통계 카드 그리드 */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.stat-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    gap: 16px;
+    transition: all var(--transition-fast);
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+.stat-icon.bg-blue {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.05));
+    color: var(--accent-blue);
+}
+
+.stat-icon.bg-green {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    color: var(--accent-green);
+}
+
+.stat-icon.bg-purple {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05));
+    color: var(--accent-purple);
+}
+
+.stat-icon.bg-orange {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    color: var(--accent-orange);
+}
+
+.stat-info {
+    flex: 1;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.stat-change {
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.stat-change.positive {
+    color: var(--accent-green);
+}
+
+.stat-change.negative {
+    color: var(--accent-red);
+}
+
+.stat-change.neutral {
+    color: var(--text-tertiary);
+}
+
+/* 대시보드 레이아웃 */
+.dashboard-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.dashboard-col-8 {
+    grid-column: span 8;
+}
+
+.dashboard-col-6 {
+    grid-column: span 6;
+}
+
+.dashboard-col-4 {
+    grid-column: span 4;
+}
+
+/* 카드 */
+.card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.card-filter {
+    padding: 6px 12px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+/* 서버 상태 */
+.server-status-item {
+    margin-bottom: 20px;
+}
+
+.server-status-item:last-child {
+    margin-bottom: 0;
+}
+
+.status-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.status-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.status-badge.running {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-green);
+}
+
+.status-bar {
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 6px;
+}
+
+.status-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple));
+    border-radius: 3px;
+    transition: width var(--transition-normal);
+}
+
+.status-value {
+    font-size: 11px;
+    color: var(--text-tertiary);
+}
+
+/* 활동 리스트 */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.activity-item {
+    display: flex;
+    gap: 12px;
+}
+
+.activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+}
+
+.activity-text {
+    font-size: 13px;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.activity-text strong {
+    font-weight: 600;
+}
+
+.activity-time {
+    font-size: 11px;
+    color: var(--text-tertiary);
+}
+
+/* 인기 컨텐츠 */
+.popular-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.popular-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+}
+
+.popular-item:hover {
+    background: var(--bg-hover);
+}
+
+.popular-rank {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.popular-rank.rank-1 {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #000;
+}
+
+.popular-rank.rank-2 {
+    background: linear-gradient(135deg, #c0c0c0, #e8e8e8);
+    color: #000;
+}
+
+.popular-rank.rank-3 {
+    background: linear-gradient(135deg, #cd7f32, #ffa500);
+    color: #000;
+}
+
+.popular-thumb {
+    width: 40px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.popular-info {
+    flex: 1;
+}
+
+.popular-title {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.popular-views {
+    font-size: 11px;
+    color: var(--text-tertiary);
+}
+
+.popular-badge {
+    padding: 4px 8px;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 4px;
+}
+
+/* 페이지 액션 */
+.page-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.page-filters {
+    display: flex;
+    gap: 12px;
+}
+
+.filter-select {
+    padding: 8px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.filter-select:hover {
+    border-color: var(--accent-blue);
+}
+
+.search-input {
+    padding: 8px 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    width: 300px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+}
+
+/* 버튼 */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all var(--transition-fast);
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(59, 130, 246, 0.3);
+}
+
+.btn-secondary {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--bg-hover);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-outline:hover {
+    background: var(--bg-hover);
+}
+
+.btn-danger {
+    background: var(--accent-red);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.btn-icon {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* 테이블 */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: var(--bg-tertiary);
+}
+
+.data-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+    background: var(--bg-tertiary);
+}
+
+.data-table td {
+    padding: 16px;
+    font-size: 13px;
+}
+
+.table-thumb {
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.table-title strong {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.table-subtitle {
+    font-size: 11px;
+    color: var(--text-tertiary);
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* 배지 */
+.badge {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-4k {
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    color: white;
+}
+
+.badge-success {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-green);
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: var(--accent-orange);
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--accent-red);
+}
+
+.badge-info {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent-blue);
+}
+
+.badge-membership {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.05));
+    color: var(--accent-purple);
+}
+
+.badge-curator {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.05));
+    color: var(--accent-orange);
+}
+
+/* 큐레이터 그리드 */
+.curator-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+}
+
+.curator-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all var(--transition-fast);
+}
+
+.curator-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.curator-header {
+    position: relative;
+    padding: 32px 24px 0;
+    text-align: center;
+}
+
+.curator-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid var(--bg-secondary);
+    object-fit: cover;
+}
+
+.curator-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.curator-badge.featured {
+    background: linear-gradient(135deg, var(--accent-orange), #ff6b6b);
+    color: white;
+}
+
+.curator-body {
+    padding: 20px 24px;
+    text-align: center;
+}
+
+.curator-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.curator-role {
+    font-size: 13px;
+    color: var(--accent-blue);
+    margin-bottom: 12px;
+}
+
+.curator-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.curator-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+}
+
+.curator-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.curator-stat .stat-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.curator-stat .stat-label {
+    font-size: 11px;
+    color: var(--text-tertiary);
+}
+
+.curator-actions {
+    padding: 16px 24px;
+    background: var(--bg-tertiary);
+    display: flex;
+    gap: 8px;
+}
+
+.curator-actions .btn {
+    flex: 1;
+}
+
+/* 모달 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2000;
+}
+
+.modal.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+}
+
+.modal-container {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideUp 0.3s ease;
+}
+
+.modal-large {
+    max-width: 900px;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-title {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 6px;
+    transition: all var(--transition-fast);
+}
+
+.modal-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.modal-footer {
+    padding: 20px 32px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.modal-section {
+    margin-bottom: 32px;
+}
+
+.modal-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* 폼 */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.form-input,
+.form-textarea {
+    padding: 10px 14px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 13px;
+    transition: all var(--transition-fast);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    background: var(--bg-hover);
+}
+
+.form-textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.form-help {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+}
+
+/* 메타데이터 가져오기 */
+.meta-fetch {
+    display: flex;
+    gap: 12px;
+}
+
+.meta-fetch .form-input {
+    flex: 1;
+}
+
+/* 업로드 영역 */
+.upload-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.upload-box {
+    padding: 32px 20px;
+    background: var(--bg-tertiary);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+    transition: all var(--transition-fast);
+}
+
+.upload-box:hover {
+    border-color: var(--accent-blue);
+    background: var(--bg-hover);
+}
+
+.upload-box i {
+    font-size: 36px;
+    color: var(--text-tertiary);
+    margin-bottom: 12px;
+}
+
+.upload-box h4 {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.upload-box p {
+    font-size: 11px;
+    color: var(--text-tertiary);
+    margin-bottom: 16px;
+}
+
+/* 이미지 업로드 그리드 */
+.image-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+}
+
+.image-upload-item {
+    aspect-ratio: 1;
+}
+
+.image-upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-tertiary);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.image-upload-label:hover {
+    border-color: var(--accent-blue);
+    background: var(--bg-hover);
+}
+
+.image-upload-label i {
+    font-size: 28px;
+    color: var(--text-tertiary);
+}
+
+.image-upload-label span {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+/* 토글 스위치 */
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.toggle-input {
+    display: none;
+}
+
+.toggle-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    transition: background var(--transition-fast);
+}
+
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    transition: all var(--transition-fast);
+}
+
+.toggle-input:checked + .toggle-slider {
+    background: var(--accent-blue);
+}
+
+.toggle-input:checked + .toggle-slider::after {
+    left: 23px;
+    background: white;
+}
+
+.toggle-text {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* 매핑 영역 */
+.mapping-area {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.mapped-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    min-height: 60px;
+}
+
+.mapped-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background: var(--bg-hover);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 12px;
+    color: var(--text-primary);
+}
+
+.mapped-tag i {
+    cursor: pointer;
+    color: var(--text-tertiary);
+    transition: color var(--transition-fast);
+}
+
+.mapped-tag i:hover {
+    color: var(--accent-red);
+}
+
+/* 사용자 검색 결과 */
+.user-search-results {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 16px;
+}
+
+.user-search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.user-search-item .user-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-search-item .user-info strong {
+    font-size: 13px;
+    margin-bottom: 2px;
+}
+
+.user-search-item .user-info span {
+    font-size: 11px;
+    color: var(--text-tertiary);
+}
+
+/* 지원 탭 */
+.support-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.support-tab {
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.support-tab:hover {
+    color: var(--text-primary);
+}
+
+.support-tab.active {
+    color: var(--accent-blue);
+    border-bottom-color: var(--accent-blue);
+}
+
+.support-content {
+    display: none;
+}
+
+.support-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+/* 반응형 */
+@media (max-width: 1024px) {
+    .dashboard-col-8,
+    .dashboard-col-6,
+    .dashboard-col-4 {
+        grid-column: span 12;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 0;
+    }
+    
+    .sidebar {
+        transform: translateX(-100%);
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .top-header {
+        left: 0;
+    }
+    
+    .btn-menu-toggle {
+        display: flex;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    }
+    
+    .header-search input {
+        width: 200px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .curator-grid {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- 사이드바 네비게이션 -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h1 class="logo">MovieLAB</h1>
+            <p class="logo-subtitle">Admin Control Center</p>
+        </div>
+        
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>대시보드</span>
+                </li>
+                <li class="nav-item" data-page="media">
+                    <i class="fas fa-film"></i>
+                    <span>영화 관리</span>
+                </li>
+                <li class="nav-item" data-page="sections">
+                    <i class="fas fa-layer-group"></i>
+                    <span>홈 섹션 관리</span>
+                </li>
+                <li class="nav-item" data-page="videos">
+                    <i class="fas fa-video"></i>
+                    <span>영상 관리</span>
+                </li>
+                <li class="nav-item" data-page="users">
+                    <i class="fas fa-users"></i>
+                    <span>사용자 관리</span>
+                </li>
+                <li class="nav-item" data-page="curators">
+                    <i class="fas fa-user-tie"></i>
+                    <span>큐레이터 관리</span>
+                </li>
+                <li class="nav-item" data-page="shop">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span>상품 관리</span>
+                </li>
+                <li class="nav-item" data-page="orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>주문 관리</span>
+                </li>
+                <li class="nav-item" data-page="articles">
+                    <i class="fas fa-newspaper"></i>
+                    <span>매거진 관리</span>
+                </li>
+                <li class="nav-item" data-page="support">
+                    <i class="fas fa-headset"></i>
+                    <span>고객지원</span>
+                </li>
+                <li class="nav-item" data-page="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>설정</span>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="sidebar-footer">
+            <div class="admin-profile">
+                <img src="https://via.placeholder.com/40" alt="Admin" class="admin-avatar">
+                <div class="admin-info">
+                    <p class="admin-name">테스트 관리자</p>
+                    <p class="admin-role">Super Admin</p>
+                </div>
+            </div>
+            <button class="btn-logout"><i class="fas fa-sign-out-alt"></i> 로그아웃</button>
+        </div>
+    </aside>
+
+    <!-- 메인 컨텐츠 영역 -->
+    <main class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="btn-menu-toggle"><i class="fas fa-bars"></i></button>
+                <h2 class="page-title">대시보드</h2>
+            </div>
+            <div class="header-right">
+                <div class="header-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="검색...">
+                </div>
+                <button class="btn-notification">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- 대시보드 페이지 -->
+        <section class="page-content active" id="dashboard">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon bg-blue">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">1,247</h3>
+                        <p class="stat-label">총 회원수</p>
+                        <span class="stat-change positive">+12.5% <i class="fas fa-arrow-up"></i></span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-green">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">269</h3>
+                        <p class="stat-label">멤버십 가입자</p>
+                        <span class="stat-change positive">+8.3% <i class="fas fa-arrow-up"></i></span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-purple">
+                        <i class="fas fa-won-sign"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">₩2.4M</h3>
+                        <p class="stat-label">이번 달 매출</p>
+                        <span class="stat-change positive">+15.7% <i class="fas fa-arrow-up"></i></span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bg-orange">
+                        <i class="fas fa-film"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="stat-value">42</h3>
+                        <p class="stat-label">등록된 영화</p>
+                        <span class="stat-change neutral">0% <i class="fas fa-minus"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-row">
+                <div class="dashboard-col-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">서비스 현황</h3>
+                            <select class="card-filter">
+                                <option>지난 7일</option>
+                                <option>지난 30일</option>
+                                <option>지난 90일</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="serviceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-col-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">서버 상태</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="server-status-item">
+                                <div class="status-info">
+                                    <span class="status-label">API 서버</span>
+                                    <span class="status-badge running">정상</span>
+                                </div>
+                                <div class="status-bar">
+                                    <div class="status-bar-fill" style="width: 45%"></div>
+                                </div>
+                                <span class="status-value">CPU 45%</span>
+                            </div>
+                            
+                            <div class="server-status-item">
+                                <div class="status-info">
+                                    <span class="status-label">스트리밍 서버</span>
+                                    <span class="status-badge running">정상</span>
+                                </div>
+                                <div class="status-bar">
+                                    <div class="status-bar-fill" style="width: 62%"></div>
+                                </div>
+                                <span class="status-value">CPU 62%</span>
+                            </div>
+                            
+                            <div class="server-status-item">
+                                <div class="status-info">
+                                    <span class="status-label">데이터베이스</span>
+                                    <span class="status-badge running">정상</span>
+                                </div>
+                                <div class="status-bar">
+                                    <div class="status-bar-fill" style="width: 38%"></div>
+                                </div>
+                                <span class="status-value">사용률 38%</span>
+                            </div>
+                            
+                            <div class="server-status-item">
+                                <div class="status-info">
+                                    <span class="status-label">CDN</span>
+                                    <span class="status-badge running">정상</span>
+                                </div>
+                                <div class="status-bar">
+                                    <div class="status-bar-fill" style="width: 71%"></div>
+                                </div>
+                                <span class="status-value">대역폭 71%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-row">
+                <div class="dashboard-col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">최근 활동</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-blue">
+                                        <i class="fas fa-user-plus"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p class="activity-text"><strong>김민준</strong>님이 회원가입했습니다</p>
+                                        <span class="activity-time">2분 전</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-green">
+                                        <i class="fas fa-shopping-cart"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p class="activity-text">새로운 주문 <strong>#ORD-17681797</strong></p>
+                                        <span class="activity-time">15분 전</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-purple">
+                                        <i class="fas fa-star"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p class="activity-text"><strong>이서연</strong>님이 멤버십에 가입했습니다</p>
+                                        <span class="activity-time">1시간 전</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-orange">
+                                        <i class="fas fa-comment"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <p class="activity-text"><strong>기생충</strong>에 새 코멘트가 등록되었습니다</p>
+                                        <span class="activity-time">2시간 전</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-col-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">인기 컨텐츠 TOP 5</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="popular-list">
+                                <div class="popular-item">
+                                    <span class="popular-rank rank-1">1</span>
+                                    <img src="https://via.placeholder.com/40x60" alt="기생충" class="popular-thumb">
+                                    <div class="popular-info">
+                                        <p class="popular-title">기생충</p>
+                                        <span class="popular-views">1,234 views</span>
+                                    </div>
+                                    <span class="popular-badge">4K</span>
+                                </div>
+                                
+                                <div class="popular-item">
+                                    <span class="popular-rank rank-2">2</span>
+                                    <img src="https://via.placeholder.com/40x60" alt="화양연화" class="popular-thumb">
+                                    <div class="popular-info">
+                                        <p class="popular-title">화양연화</p>
+                                        <span class="popular-views">987 views</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="popular-item">
+                                    <span class="popular-rank rank-3">3</span>
+                                    <img src="https://via.placeholder.com/40x60" alt="올드보이" class="popular-thumb">
+                                    <div class="popular-info">
+                                        <p class="popular-title">올드보이</p>
+                                        <span class="popular-views">854 views</span>
+                                    </div>
+                                    <span class="popular-badge">4K</span>
+                                </div>
+                                
+                                <div class="popular-item">
+                                    <span class="popular-rank">4</span>
+                                    <img src="https://via.placeholder.com/40x60" alt="트윈 픽스" class="popular-thumb">
+                                    <div class="popular-info">
+                                        <p class="popular-title">트윈 픽스</p>
+                                        <span class="popular-views">721 views</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="popular-item">
+                                    <span class="popular-rank">5</span>
+                                    <img src="https://via.placeholder.com/40x60" alt="아멜리에" class="popular-thumb">
+                                    <div class="popular-info">
+                                        <p class="popular-title">아멜리에</p>
+                                        <span class="popular-views">689 views</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 영화 관리 페이지 -->
+        <section class="page-content" id="media">
+            <div class="page-actions">
+                <button class="btn btn-primary" id="btnAddMovie">
+                    <i class="fas fa-plus"></i> 새 영화 추가
+                </button>
+                <div class="page-filters">
+                    <select class="filter-select">
+                        <option>전체</option>
+                        <option>드라마</option>
+                        <option>SF</option>
+                        <option>스릴러</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>모든 상태</option>
+                        <option>공개</option>
+                        <option>비공개</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" class="select-all"></th>
+                            <th>썸네일</th>
+                            <th>제목</th>
+                            <th>감독</th>
+                            <th>개봉년도</th>
+                            <th>조회수</th>
+                            <th>4K</th>
+                            <th>상태</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><img src="https://via.placeholder.com/60x90" alt="기생충" class="table-thumb"></td>
+                            <td>
+                                <div class="table-title">
+                                    <strong>기생충</strong>
+                                    <span class="table-subtitle">Parasite</span>
+                                </div>
+                            </td>
+                            <td>봉준호</td>
+                            <td>2019</td>
+                            <td>1,234</td>
+                            <td><span class="badge badge-4k">4K</span></td>
+                            <td><span class="badge badge-success">공개</span></td>
+                            <td>
+                                <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><img src="https://via.placeholder.com/60x90" alt="화양연화" class="table-thumb"></td>
+                            <td>
+                                <div class="table-title">
+                                    <strong>화양연화</strong>
+                                    <span class="table-subtitle">In the Mood for Love</span>
+                                </div>
+                            </td>
+                            <td>왕가위</td>
+                            <td>2000</td>
+                            <td>987</td>
+                            <td></td>
+                            <td><span class="badge badge-success">공개</span></td>
+                            <td>
+                                <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><img src="https://via.placeholder.com/60x90" alt="올드보이" class="table-thumb"></td>
+                            <td>
+                                <div class="table-title">
+                                    <strong>올드보이</strong>
+                                    <span class="table-subtitle">Oldboy</span>
+                                </div>
+                            </td>
+                            <td>박찬욱</td>
+                            <td>2003</td>
+                            <td>854</td>
+                            <td><span class="badge badge-4k">4K</span></td>
+                            <td><span class="badge badge-success">공개</span></td>
+                            <td>
+                                <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 사용자 관리 페이지 -->
+        <section class="page-content" id="users">
+            <div class="page-actions">
+                <div class="page-filters">
+                    <input type="text" class="search-input" placeholder="이름, 이메일로 검색...">
+                    <select class="filter-select">
+                        <option>모든 등급</option>
+                        <option>일반 회원</option>
+                        <option>멤버십</option>
+                        <option>큐레이터</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" class="select-all"></th>
+                            <th>사용자</th>
+                            <th>이메일</th>
+                            <th>가입일</th>
+                            <th>등급</th>
+                            <th>시청 시간</th>
+                            <th>상태</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>
+                                <div class="user-cell">
+                                    <img src="https://via.placeholder.com/40" alt="김민준" class="user-avatar">
+                                    <span>김민준</span>
+                                </div>
+                            </td>
+                            <td>test1234@gmail.com</td>
+                            <td>2025.08.04</td>
+                            <td><span class="badge badge-membership">멤버십</span></td>
+                            <td>127시간</td>
+                            <td><span class="badge badge-success">활성</span></td>
+                            <td>
+                                <button class="btn-icon" title="상세보기"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>
+                                <div class="user-cell">
+                                    <img src="https://via.placeholder.com/40" alt="이서연" class="user-avatar">
+                                    <span>이서연</span>
+                                </div>
+                            </td>
+                            <td>user@example.com</td>
+                            <td>2025.06.15</td>
+                            <td><span class="badge badge-curator">큐레이터</span></td>
+                            <td>89시간</td>
+                            <td><span class="badge badge-success">활성</span></td>
+                            <td>
+                                <button class="btn-icon" title="상세보기"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 큐레이터 관리 페이지 -->
+        <section class="page-content" id="curators">
+            <div class="page-actions">
+                <button class="btn btn-primary" id="btnPromoteCurator">
+                    <i class="fas fa-user-plus"></i> 큐레이터 승격
+                </button>
+            </div>
+
+            <div class="curator-grid">
+                <div class="curator-card">
+                    <div class="curator-header">
+                        <img src="https://via.placeholder.com/100" alt="Mark Cousins" class="curator-avatar">
+                        <span class="curator-badge featured">이달의 큐레이터</span>
+                    </div>
+                    <div class="curator-body">
+                        <h3 class="curator-name">Mark Cousins</h3>
+                        <p class="curator-role">영화 비평가</p>
+                        <p class="curator-desc">영화의 역사를 탐구하고, 시네마의 본질을 연구합니다</p>
+                        <div class="curator-stats">
+                            <div class="curator-stat">
+                                <span class="stat-value">24</span>
+                                <span class="stat-label">컬렉션</span>
+                            </div>
+                            <div class="curator-stat">
+                                <span class="stat-value">1.2K</span>
+                                <span class="stat-label">팔로워</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="curator-actions">
+                        <button class="btn btn-sm btn-outline">이달의 큐레이터 해제</button>
+                        <button class="btn btn-sm btn-danger">큐레이터 해제</button>
+                    </div>
+                </div>
+
+                <div class="curator-card">
+                    <div class="curator-header">
+                        <img src="https://via.placeholder.com/100" alt="Adrian Martin" class="curator-avatar">
+                    </div>
+                    <div class="curator-body">
+                        <h3 class="curator-name">Adrian Martin</h3>
+                        <p class="curator-role">영화 연구자</p>
+                        <p class="curator-desc">모던 시네마와 예술영화를 중심으로 큐레이션합니다</p>
+                        <div class="curator-stats">
+                            <div class="curator-stat">
+                                <span class="stat-value">18</span>
+                                <span class="stat-label">컬렉션</span>
+                            </div>
+                            <div class="curator-stat">
+                                <span class="stat-value">856</span>
+                                <span class="stat-label">팔로워</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="curator-actions">
+                        <button class="btn btn-sm btn-primary">이달의 큐레이터 지정</button>
+                        <button class="btn btn-sm btn-danger">큐레이터 해제</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 상품 관리 페이지 -->
+        <section class="page-content" id="shop">
+            <div class="page-actions">
+                <button class="btn btn-primary" id="btnAddProduct">
+                    <i class="fas fa-plus"></i> 새 상품 등록
+                </button>
+            </div>
+
+            <div class="card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" class="select-all"></th>
+                            <th>이미지</th>
+                            <th>상품명</th>
+                            <th>카테고리</th>
+                            <th>가격</th>
+                            <th>멤버십 가격</th>
+                            <th>재고</th>
+                            <th>상태</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><img src="https://via.placeholder.com/60" alt="기생충 포스터" class="table-thumb"></td>
+                            <td>
+                                <div class="table-title">
+                                    <strong>기생충 오리지널 포스터</strong>
+                                </div>
+                            </td>
+                            <td>포스터</td>
+                            <td>₩40,500</td>
+                            <td>₩30,000</td>
+                            <td>23</td>
+                            <td><span class="badge badge-success">판매중</span></td>
+                            <td>
+                                <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td><img src="https://via.placeholder.com/60" alt="MovieLAB 굿즈" class="table-thumb"></td>
+                            <td>
+                                <div class="table-title">
+                                    <strong>MovieLAB 코치</strong>
+                                </div>
+                            </td>
+                            <td>의류</td>
+                            <td>₩22,000</td>
+                            <td>₩16,000</td>
+                            <td>45</td>
+                            <td><span class="badge badge-success">판매중</span></td>
+                            <td>
+                                <button class="btn-icon" title="수정"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="삭제"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 주문 관리 페이지 -->
+        <section class="page-content" id="orders">
+            <div class="page-actions">
+                <div class="page-filters">
+                    <select class="filter-select">
+                        <option>모든 상태</option>
+                        <option>결제 완료</option>
+                        <option>배송 준비</option>
+                        <option>배송 중</option>
+                        <option>배송 완료</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>주문번호</th>
+                            <th>고객명</th>
+                            <th>상품</th>
+                            <th>금액</th>
+                            <th>주문일</th>
+                            <th>배송상태</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>ORD-17681797</strong></td>
+                            <td>김민준</td>
+                            <td>기생충 오리지널 포스터</td>
+                            <td>₩48,000</td>
+                            <td>2025.01.12</td>
+                            <td><span class="badge badge-warning">결제 완료</span></td>
+                            <td>
+                                <button class="btn-icon" title="상세보기"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" title="송장입력"><i class="fas fa-truck"></i></button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>ORD-17681793</strong></td>
+                            <td>이서연</td>
+                            <td>트윈 픽스 스코어 LP</td>
+                            <td>₩176,000</td>
+                            <td>2025.01.10</td>
+                            <td><span class="badge badge-info">배송 중</span></td>
+                            <td>
+                                <button class="btn-icon" title="상세보기"><i class="fas fa-eye"></i></button>
+                                <button class="btn-icon" title="송장확인"><i class="fas fa-truck"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 고객지원 페이지 -->
+        <section class="page-content" id="support">
+            <div class="support-tabs">
+                <button class="support-tab active" data-tab="tickets">1:1 문의</button>
+                <button class="support-tab" data-tab="reports">신고 관리</button>
+            </div>
+
+            <div class="support-content active" data-content="tickets">
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>티켓번호</th>
+                                <th>고객명</th>
+                                <th>제목</th>
+                                <th>카테고리</th>
+                                <th>등록일</th>
+                                <th>상태</th>
+                                <th>작업</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#TICK-1234</td>
+                                <td>김민준</td>
+                                <td>결제 취소 요청</td>
+                                <td>결제/환불</td>
+                                <td>2025.01.15</td>
+                                <td><span class="badge badge-warning">대기중</span></td>
+                                <td>
+                                    <button class="btn-icon" title="답변하기"><i class="fas fa-reply"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>#TICK-1233</td>
+                                <td>박지은</td>
+                                <td>영상이 재생되지 않아요</td>
+                                <td>기술지원</td>
+                                <td>2025.01.14</td>
+                                <td><span class="badge badge-success">완료</span></td>
+                                <td>
+                                    <button class="btn-icon" title="보기"><i class="fas fa-eye"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="support-content" data-content="reports">
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>신고번호</th>
+                                <th>신고자</th>
+                                <th>신고 대상</th>
+                                <th>사유</th>
+                                <th>신고일</th>
+                                <th>상태</th>
+                                <th>작업</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>#REP-456</td>
+                                <td>이서연</td>
+                                <td>기생충 코멘트 (user_789)</td>
+                                <td>스포일러</td>
+                                <td>2025.01.15</td>
+                                <td><span class="badge badge-danger">검토중</span></td>
+                                <td>
+                                    <button class="btn-icon" title="블라인드"><i class="fas fa-eye-slash"></i></button>
+                                    <button class="btn-icon" title="기각"><i class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 영화 추가/수정 모달 -->
+    <div class="modal" id="movieModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title">새 영화 추가</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="section-title">기본 정보</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label class="form-label">메타데이터 자동 가져오기</label>
+                            <div class="meta-fetch">
+                                <input type="text" class="form-input" placeholder="IMDb URL 또는 영화 ID 입력">
+                                <button class="btn btn-secondary">
+                                    <i class="fas fa-download"></i> 메타데이터 가져오기
+                                </button>
+                            </div>
+                            <p class="form-help">IMDb 또는 TMDb에서 자동으로 정보를 가져옵니다</p>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">한글 제목 *</label>
+                            <input type="text" class="form-input" placeholder="예: 기생충">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">영문 제목</label>
+                            <input type="text" class="form-input" placeholder="예: Parasite">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">감독 *</label>
+                            <input type="text" class="form-input" placeholder="예: 봉준호">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">개봉년도 *</label>
+                            <input type="number" class="form-input" placeholder="2019">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">장르</label>
+                            <select class="form-input" multiple>
+                                <option>드라마</option>
+                                <option>스릴러</option>
+                                <option>코미디</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">상영시간 (분)</label>
+                            <input type="number" class="form-input" placeholder="132">
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label">줄거리</label>
+                        <textarea class="form-textarea" rows="4" placeholder="영화의 줄거리를 입력하세요..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">관람등급</label>
+                            <select class="form-input">
+                                <option>전체관람가</option>
+                                <option>12세 관람가</option>
+                                <option>15세 관람가</option>
+                                <option>청소년 관람불가</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">국가</label>
+                            <input type="text" class="form-input" placeholder="한국">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h3 class="section-title">영상 파일</h3>
+                    
+                    <div class="upload-area">
+                        <div class="upload-box">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>메인 영상 업로드 (4K)</h4>
+                            <p>MP4, MKV, MOV 파일 지원 (최대 50GB)</p>
+                            <input type="file" id="videoMain4K" accept="video/*" style="display: none;">
+                            <button class="btn btn-outline" onclick="document.getElementById('videoMain4K').click()">
+                                파일 선택
+                            </button>
+                        </div>
+
+                        <div class="upload-box">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>메인 영상 업로드 (FHD)</h4>
+                            <p>MP4, MKV, MOV 파일 지원 (최대 20GB)</p>
+                            <input type="file" id="videoMainFHD" accept="video/*" style="display: none;">
+                            <button class="btn btn-outline" onclick="document.getElementById('videoMainFHD').click()">
+                                파일 선택
+                            </button>
+                        </div>
+
+                        <div class="upload-box">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <h4>예고편 업로드</h4>
+                            <p>MP4 파일 지원 (최대 500MB)</p>
+                            <input type="file" id="videoTrailer" accept="video/*" style="display: none;">
+                            <button class="btn btn-outline" onclick="document.getElementById('videoTrailer').click()">
+                                파일 선택
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">자막 파일 (.srt / .vtt)</label>
+                        <input type="file" class="form-input" accept=".srt,.vtt" multiple>
+                        <p class="form-help">여러 언어의 자막을 동시에 업로드할 수 있습니다</p>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">4K 배지 표시</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="toggle-label">
+                                <input type="checkbox" class="toggle-input">
+                                <span class="toggle-slider"></span>
+                                <span class="toggle-text">공개 상태</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h3 class="section-title">이미지 & 썸네일</h3>
+                    
+                    <div class="image-upload-grid">
+                        <div class="image-upload-item">
+                            <label class="image-upload-label">
+                                <i class="fas fa-image"></i>
+                                <span>포스터 이미지</span>
+                                <input type="file" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                        <div class="image-upload-item">
+                            <label class="image-upload-label">
+                                <i class="fas fa-image"></i>
+                                <span>배경 이미지</span>
+                                <input type="file" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                        <div class="image-upload-item">
+                            <label class="image-upload-label">
+                                <i class="fas fa-image"></i>
+                                <span>썸네일 이미지</span>
+                                <input type="file" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h3 class="section-title">큐레이션 & 연결</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">관련 굿즈 매핑</label>
+                        <div class="mapping-area">
+                            <input type="text" class="form-input" placeholder="상품명으로 검색...">
+                            <div class="mapped-items">
+                                <span class="mapped-tag">
+                                    기생충 오리지널 포스터
+                                    <i class="fas fa-times"></i>
+                                </span>
+                                <span class="mapped-tag">
+                                    기생충 스토리북
+                                    <i class="fas fa-times"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline">취소</button>
+                <button class="btn btn-primary">저장하기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 큐레이터 승격 모달 -->
+    <div class="modal" id="curatorPromoteModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 class="modal-title">큐레이터 승격</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">사용자 검색</label>
+                    <input type="text" class="form-input" placeholder="이름 또는 이메일로 검색...">
+                </div>
+
+                <div class="user-search-results">
+                    <div class="user-search-item">
+                        <img src="https://via.placeholder.com/40" alt="User" class="user-avatar">
+                        <div class="user-info">
+                            <strong>박지은</strong>
+                            <span>movie.lover@gmail.com</span>
+                        </div>
+                        <button class="btn btn-sm btn-primary">승격</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상품 등록 모달 -->
+    <div class="modal" id="productModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container modal-large">
+            <div class="modal-header">
+                <h2 class="modal-title">새 상품 등록</h2>
+                <button class="modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3 class="section-title">상품 정보</h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">상품명 *</label>
+                        <input type="text" class="form-input" placeholder="예: 기생충 오리지널 포스터">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">상품 설명</label>
+                        <textarea class="form-textarea" rows="4" placeholder="상품 상세 설명..."></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">카테고리</label>
+                            <select class="form-input">
+                                <option>포스터</option>
+                                <option>의류</option>
+                                <option>굿즈</option>
+                                <option>도서</option>
+                                <option>음반</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">재고 수량</label>
+                            <input type="number" class="form-input" placeholder="0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">정상가 *</label>
+                            <input type="number" class="form-input" placeholder="40000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">멤버십 할인가</label>
+                            <input type="number" class="form-input" placeholder="30000">
+                            <p class="form-help">멤버십 회원 전용 특별가</p>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="toggle-label">
+                            <input type="checkbox" class="toggle-input" checked>
+                            <span class="toggle-slider"></span>
+                            <span class="toggle-text">멤버십 자동 할인 적용 (25% OFF)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h3 class="section-title">상품 이미지</h3>
+                    <div class="image-upload-grid">
+                        <div class="image-upload-item">
+                            <label class="image-upload-label">
+                                <i class="fas fa-image"></i>
+                                <span>대표 이미지</span>
+                                <input type="file" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                        <div class="image-upload-item">
+                            <label class="image-upload-label">
+                                <i class="fas fa-image"></i>
+                                <span>상세 이미지 1</span>
+                                <input type="file" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                        <div class="image-upload-item">
+                            <label class="image-upload-label">
+                                <i class="fas fa-image"></i>
+                                <span>상세 이미지 2</span>
+                                <input type="file" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-section">
+                    <h3 class="section-title">영화 연결</h3>
+                    <div class="form-group">
+                        <label class="form-label">관련 영화 매핑</label>
+                        <input type="text" class="form-input" placeholder="영화 제목으로 검색...">
+                        <div class="mapped-items">
+                            <span class="mapped-tag">
+                                기생충 (2019)
+                                <i class="fas fa-times"></i>
+                            </span>
+                        </div>
+                        <p class="form-help">해당 영화 상세 페이지에 '관련 굿즈'로 노출됩니다</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-outline">취소</button>
+                <button class="btn btn-primary">상품 등록</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="admin.js"></script>
+    
+    <!-- API 클라이언트 -->
+    <script>
+/**
+ * MovieLAB Admin - API 연동 버전
+ * 실제 백엔드 API와 통신하는 프론트엔드
+ */
+
+// ==================== 설정 ====================
+const CONFIG = {
+    API_BASE_URL: 'http://localhost:5000/api',
+    TOKEN_KEY: 'movielab_admin_token',
+    USER_KEY: 'movielab_admin_user'
+};
+
+// ==================== API 클라이언트 ====================
+class ApiClient {
+    constructor(baseURL) {
+        this.baseURL = baseURL;
+    }
+
+    // 토큰 가져오기
+    getToken() {
+        return localStorage.getItem(CONFIG.TOKEN_KEY);
+    }
+
+    // 토큰 저장
+    setToken(token) {
+        localStorage.setItem(CONFIG.TOKEN_KEY, token);
+    }
+
+    // 토큰 삭제
+    removeToken() {
+        localStorage.removeItem(CONFIG.TOKEN_KEY);
+        localStorage.removeItem(CONFIG.USER_KEY);
+    }
+
+    // 헤더 구성
+    getHeaders(includeAuth = true) {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        if (includeAuth) {
+            const token = this.getToken();
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+        }
+
+        return headers;
+    }
+
+    // HTTP 요청
+    async request(endpoint, options = {}) {
+        const url = `${this.baseURL}${endpoint}`;
+        const config = {
+            ...options,
+            headers: this.getHeaders(options.auth !== false)
+        };
+
+        try {
+            const response = await fetch(url, config);
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}`);
+            }
+
+            return data;
+        } catch (error) {
+            console.error('API 요청 실패:', error);
+            
+            // 401 에러 시 로그인 페이지로 리다이렉트
+            if (error.message.includes('401') || error.message.includes('Token expired')) {
+                this.removeToken();
+                window.location.reload();
+            }
+
+            throw error;
+        }
+    }
+
+    // GET 요청
+    async get(endpoint, params = {}) {
+        const queryString = new URLSearchParams(params).toString();
+        const url = queryString ? `${endpoint}?${queryString}` : endpoint;
+        
+        return this.request(url, { method: 'GET' });
+    }
+
+    // POST 요청
+    async post(endpoint, data) {
+        return this.request(endpoint, {
+            method: 'POST',
+            body: JSON.stringify(data)
+        });
+    }
+
+    // PUT 요청
+    async put(endpoint, data) {
+        return this.request(endpoint, {
+            method: 'PUT',
+            body: JSON.stringify(data)
+        });
+    }
+
+    // PATCH 요청
+    async patch(endpoint, data) {
+        return this.request(endpoint, {
+            method: 'PATCH',
+            body: JSON.stringify(data)
+        });
+    }
+
+    // DELETE 요청
+    async delete(endpoint) {
+        return this.request(endpoint, { method: 'DELETE' });
+    }
+
+    // 파일 업로드
+    async uploadFile(endpoint, file, onProgress) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const token = this.getToken();
+        const xhr = new XMLHttpRequest();
+
+        return new Promise((resolve, reject) => {
+            xhr.upload.addEventListener('progress', (e) => {
+                if (e.lengthComputable && onProgress) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    onProgress(percentComplete);
+                }
+            });
+
+            xhr.addEventListener('load', () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(JSON.parse(xhr.response));
+                } else {
+                    reject(new Error(`Upload failed: ${xhr.status}`));
+                }
+            });
+
+            xhr.addEventListener('error', () => {
+                reject(new Error('Upload failed'));
+            });
+
+            xhr.open('POST', `${this.baseURL}${endpoint}`);
+            if (token) {
+                xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+            }
+            xhr.send(formData);
+        });
+    }
+}
+
+// API 클라이언트 인스턴스
+const api = new ApiClient(CONFIG.API_BASE_URL);
+
+// ==================== 인증 서비스 ====================
+class AuthService {
+    // 로그인
+    async login(email, password) {
+        try {
+            const response = await api.post('/auth/login', { email, password });
+            
+            if (response.token) {
+                api.setToken(response.token);
+                localStorage.setItem(CONFIG.USER_KEY, JSON.stringify(response.user));
+                return response.user;
+            }
+            
+            throw new Error('Login failed');
+        } catch (error) {
+            console.error('로그인 실패:', error);
+            throw error;
+        }
+    }
+
+    // 로그아웃
+    async logout() {
+        try {
+            await api.post('/auth/logout');
+        } catch (error) {
+            console.error('로그아웃 실패:', error);
+        } finally {
+            api.removeToken();
+        }
+    }
+
+    // 현재 사용자 정보
+    getCurrentUser() {
+        const userStr = localStorage.getItem(CONFIG.USER_KEY);
+        return userStr ? JSON.parse(userStr) : null;
+    }
+
+    // 로그인 여부 확인
+    isAuthenticated() {
+        return !!api.getToken();
+    }
+
+    // 토큰 갱신
+    async refreshToken() {
+        try {
+            const response = await api.post('/auth/refresh');
+            if (response.token) {
+                api.setToken(response.token);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('토큰 갱신 실패:', error);
+            return false;
+        }
+    }
+}
+
+const authService = new AuthService();
+
+// ==================== 대시보드 서비스 ====================
+class DashboardService {
+    // 통계 데이터
+    async getStats() {
+        return await api.get('/admin/dashboard/stats');
+    }
+
+    // 활동 피드
+    async getActivityFeed(limit = 20) {
+        return await api.get('/admin/dashboard/activity', { limit });
+    }
+}
+
+const dashboardService = new DashboardService();
+
+// ==================== 영화 서비스 ====================
+class MovieService {
+    // 영화 목록
+    async getMovies(params = {}) {
+        return await api.get('/admin/movies', params);
+    }
+
+    // 영화 상세
+    async getMovie(id) {
+        return await api.get(`/admin/movies/${id}`);
+    }
+
+    // 영화 생성
+    async createMovie(data) {
+        return await api.post('/admin/movies', data);
+    }
+
+    // 영화 수정
+    async updateMovie(id, data) {
+        return await api.put(`/admin/movies/${id}`, data);
+    }
+
+    // 영화 삭제
+    async deleteMovie(id) {
+        return await api.delete(`/admin/movies/${id}`);
+    }
+
+    // 메타데이터 가져오기
+    async fetchMetadata(imdbUrl) {
+        return await api.post('/admin/movies/fetch-metadata', { imdbUrl });
+    }
+
+    // 상태 변경
+    async updateStatus(id, status) {
+        return await api.patch(`/admin/movies/${id}/status`, { status });
+    }
+}
+
+const movieService = new MovieService();
+
+// ==================== 사용자 서비스 ====================
+class UserService {
+    // 사용자 목록
+    async getUsers(params = {}) {
+        return await api.get('/admin/users', params);
+    }
+
+    // 사용자 상세
+    async getUser(id) {
+        return await api.get(`/admin/users/${id}`);
+    }
+
+    // 사용자 수정
+    async updateUser(id, data) {
+        return await api.put(`/admin/users/${id}`, data);
+    }
+
+    // 사용자 삭제
+    async deleteUser(id) {
+        return await api.delete(`/admin/users/${id}`);
+    }
+
+    // 멤버십 연장
+    async extendMembership(id, duration) {
+        return await api.post(`/admin/users/${id}/extend-membership`, { duration });
+    }
+
+    // 큐레이터 승격
+    async promoteToCurator(userId, data) {
+        return await api.post(`/admin/users/${userId}/promote-curator`, data);
+    }
+}
+
+const userService = new UserService();
+
+// ==================== 큐레이터 서비스 ====================
+class CuratorService {
+    // 큐레이터 목록
+    async getCurators(params = {}) {
+        return await api.get('/admin/curators', params);
+    }
+
+    // 큐레이터 상세
+    async getCurator(id) {
+        return await api.get(`/admin/curators/${id}`);
+    }
+
+    // 큐레이터 수정
+    async updateCurator(id, data) {
+        return await api.put(`/admin/curators/${id}`, data);
+    }
+
+    // 큐레이터 삭제
+    async deleteCurator(id) {
+        return await api.delete(`/admin/curators/${id}`);
+    }
+
+    // 이달의 큐레이터 지정
+    async setFeatured(id) {
+        return await api.patch(`/admin/curators/${id}/featured`);
+    }
+
+    // 상태 변경
+    async updateStatus(id, status) {
+        return await api.patch(`/admin/curators/${id}/status`, { status });
+    }
+}
+
+const curatorService = new CuratorService();
+
+// ==================== 상품 서비스 ====================
+class ProductService {
+    // 상품 목록
+    async getProducts(params = {}) {
+        return await api.get('/admin/products', params);
+    }
+
+    // 상품 상세
+    async getProduct(id) {
+        return await api.get(`/admin/products/${id}`);
+    }
+
+    // 상품 생성
+    async createProduct(data) {
+        return await api.post('/admin/products', data);
+    }
+
+    // 상품 수정
+    async updateProduct(id, data) {
+        return await api.put(`/admin/products/${id}`, data);
+    }
+
+    // 상품 삭제
+    async deleteProduct(id) {
+        return await api.delete(`/admin/products/${id}`);
+    }
+}
+
+const productService = new ProductService();
+
+// ==================== 주문 서비스 ====================
+class OrderService {
+    // 주문 목록
+    async getOrders(params = {}) {
+        return await api.get('/admin/orders', params);
+    }
+
+    // 주문 상세
+    async getOrder(id) {
+        return await api.get(`/admin/orders/${id}`);
+    }
+
+    // 주문 상태 업데이트
+    async updateStatus(id, data) {
+        return await api.patch(`/admin/orders/${id}/status`, data);
+    }
+}
+
+const orderService = new OrderService();
+
+// ==================== 고객 지원 서비스 ====================
+class SupportService {
+    // 티켓 목록
+    async getTickets(params = {}) {
+        return await api.get('/admin/support/tickets', params);
+    }
+
+    // 티켓 상세
+    async getTicket(id) {
+        return await api.get(`/admin/support/tickets/${id}`);
+    }
+
+    // 티켓 생성
+    async createTicket(data) {
+        return await api.post('/admin/support/tickets', data);
+    }
+
+    // 티켓 수정
+    async updateTicket(id, data) {
+        return await api.put(`/admin/support/tickets/${id}`, data);
+    }
+
+    // 응답 추가
+    async addResponse(id, message, isStaff = true) {
+        return await api.post(`/admin/support/tickets/${id}/response`, { message, isStaff });
+    }
+
+    // 티켓 해결
+    async resolveTicket(id, resolution) {
+        return await api.patch(`/admin/support/tickets/${id}/resolve`, { resolution });
+    }
+
+    // 티켓 할당
+    async assignTicket(id, assignedTo) {
+        return await api.patch(`/admin/support/tickets/${id}/assign`, { assignedTo });
+    }
+
+    // 스포일러 처리
+    async handleSpoilerReport(id, action) {
+        return await api.post(`/admin/support/tickets/${id}/spoiler-action`, { action });
+    }
+}
+
+const supportService = new SupportService();
+
+// ==================== 파일 업로드 서비스 ====================
+class UploadService {
+    // 단일 파일 업로드
+    async uploadSingle(file, uploadType, onProgress) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('uploadType', uploadType);
+
+        return await api.uploadFile('/admin/upload/single', file, onProgress);
+    }
+
+    // 청크 업로드 초기화
+    async initChunkUpload(filename, totalChunks, fileSize) {
+        return await api.post('/admin/upload/chunk/init', {
+            filename,
+            totalChunks,
+            fileSize
+        });
+    }
+
+    // 청크 업로드
+    async uploadChunk(uploadId, chunkIndex, chunk, onProgress) {
+        const formData = new FormData();
+        formData.append('file', chunk);
+        formData.append('uploadId', uploadId);
+        formData.append('chunkIndex', chunkIndex);
+
+        return await api.uploadFile('/admin/upload/chunk', chunk, onProgress);
+    }
+
+    // 청크 병합
+    async mergeChunks(uploadId) {
+        return await api.post('/admin/upload/chunk/merge', { uploadId });
+    }
+
+    // 대용량 파일 업로드 (청크 방식)
+    async uploadLargeFile(file, onProgress) {
+        const chunkSize = 5 * 1024 * 1024; // 5MB
+        const totalChunks = Math.ceil(file.size / chunkSize);
+
+        // 초기화
+        const { uploadId } = await this.initChunkUpload(file.name, totalChunks, file.size);
+
+        // 청크 업로드
+        for (let i = 0; i < totalChunks; i++) {
+            const start = i * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const chunk = file.slice(start, end);
+
+            await this.uploadChunk(uploadId, i, chunk, (progress) => {
+                const totalProgress = ((i + progress / 100) / totalChunks) * 100;
+                if (onProgress) onProgress(totalProgress);
+            });
+        }
+
+        // 병합
+        return await this.mergeChunks(uploadId);
+    }
+}
+
+const uploadService = new UploadService();
+
+// ==================== UI 유틸리티 ====================
+const UI = {
+    // 로딩 표시
+    showLoading(message = '로딩 중...') {
+        const loader = document.createElement('div');
+        loader.id = 'global-loader';
+        loader.innerHTML = `
+            <div class="loader-overlay">
+                <div class="loader-content">
+                    <div class="spinner"></div>
+                    <p>${message}</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(loader);
+    },
+
+    // 로딩 숨김
+    hideLoading() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.remove();
+    },
+
+    // 토스트 알림
+    showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    },
+
+    // 확인 다이얼로그
+    async confirm(message) {
+        return new Promise((resolve) => {
+            const result = window.confirm(message);
+            resolve(result);
+        });
+    },
+
+    // 에러 표시
+    showError(error) {
+        const message = error.message || '오류가 발생했습니다';
+        this.showToast(message, 'error');
+        console.error('Error:', error);
+    }
+};
+
+// ==================== 전역 export ====================
+window.MovieLabAdmin = {
+    api,
+    authService,
+    dashboardService,
+    movieService,
+    userService,
+    curatorService,
+    productService,
+    orderService,
+    supportService,
+    uploadService,
+    UI,
+    CONFIG
+};
+
+console.log('✅ MovieLAB Admin API 클라이언트 로드 완료');
+    </script>
+    
+    <!-- 메인 애플리케이션 -->
+    <script>
+/**
+ * MovieLAB Admin - 메인 애플리케이션 (API 연동 버전)
+ */
+
+// ==================== 앱 초기화 ====================
+class MovieLabAdminApp {
+    constructor() {
+        this.currentPage = 'dashboard';
+        this.currentUser = null;
+        this.init();
+    }
+
+    async init() {
+        // 인증 확인
+        if (!authService.isAuthenticated()) {
+            this.showLoginScreen();
+            return;
+        }
+
+        this.currentUser = authService.getCurrentUser();
+        this.setupEventListeners();
+        await this.loadDashboard();
+    }
+
+    // ==================== 로그인 화면 ====================
+    showLoginScreen() {
+        document.body.innerHTML = `
+            <div class="login-container">
+                <div class="login-box">
+                    <h1 class="login-title">🎬 MovieLAB Admin</h1>
+                    <p class="login-subtitle">관리자 로그인</p>
+                    
+                    <form id="login-form" class="login-form">
+                        <div class="form-group">
+                            <label>이메일</label>
+                            <input type="email" id="login-email" placeholder="admin@movielab.com" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>비밀번호</label>
+                            <input type="password" id="login-password" placeholder="••••••••" required>
+                        </div>
+                        
+                        <button type="submit" class="btn-login">로그인</button>
+                        
+                        <div class="login-hint">
+                            <small>테스트 계정: admin@movielab.com / admin123</small>
+                        </div>
+                    </form>
+                    
+                    <div id="login-error" class="login-error" style="display:none;"></div>
+                </div>
+            </div>
+            
+            <style>
+                .login-container {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    min-height: 100vh;
+                    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                }
+                
+                .login-box {
+                    background: #0f1419;
+                    padding: 40px;
+                    border-radius: 16px;
+                    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+                    width: 100%;
+                    max-width: 400px;
+                }
+                
+                .login-title {
+                    font-size: 32px;
+                    margin-bottom: 8px;
+                    text-align: center;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+                
+                .login-subtitle {
+                    text-align: center;
+                    color: #8b92a7;
+                    margin-bottom: 32px;
+                }
+                
+                .login-form .form-group {
+                    margin-bottom: 20px;
+                }
+                
+                .login-form label {
+                    display: block;
+                    margin-bottom: 8px;
+                    color: #d1d5db;
+                    font-size: 14px;
+                }
+                
+                .login-form input {
+                    width: 100%;
+                    padding: 12px;
+                    background: #1a1f2e;
+                    border: 1px solid #2d3748;
+                    border-radius: 8px;
+                    color: #fff;
+                    font-size: 14px;
+                    transition: border-color 0.3s;
+                }
+                
+                .login-form input:focus {
+                    outline: none;
+                    border-color: #667eea;
+                }
+                
+                .btn-login {
+                    width: 100%;
+                    padding: 14px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border: none;
+                    border-radius: 8px;
+                    color: white;
+                    font-size: 16px;
+                    font-weight: 600;
+                    cursor: pointer;
+                    transition: transform 0.2s;
+                }
+                
+                .btn-login:hover {
+                    transform: translateY(-2px);
+                }
+                
+                .login-hint {
+                    text-align: center;
+                    margin-top: 16px;
+                    color: #6b7280;
+                }
+                
+                .login-error {
+                    margin-top: 16px;
+                    padding: 12px;
+                    background: rgba(239, 68, 68, 0.1);
+                    border: 1px solid #ef4444;
+                    border-radius: 8px;
+                    color: #ef4444;
+                    font-size: 14px;
+                }
+            </style>
+        `;
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await this.handleLogin();
+        });
+    }
+
+    async handleLogin() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorDiv = document.getElementById('login-error');
+
+        try {
+            UI.showLoading('로그인 중...');
+            const user = await authService.login(email, password);
+            
+            UI.hideLoading();
+            UI.showToast('로그인 성공!', 'success');
+            
+            // 페이지 새로고침하여 메인 앱 로드
+            window.location.reload();
+        } catch (error) {
+            UI.hideLoading();
+            errorDiv.textContent = '로그인 실패: ' + (error.message || '이메일 또는 비밀번호를 확인하세요');
+            errorDiv.style.display = 'block';
+        }
+    }
+
+    // ==================== 이벤트 리스너 설정 ====================
+    setupEventListeners() {
+        // 네비게이션
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const page = item.dataset.page;
+                this.navigateTo(page);
+            });
+        });
+
+        // 로그아웃
+        document.querySelector('.btn-logout')?.addEventListener('click', async () => {
+            if (await UI.confirm('로그아웃 하시겠습니까?')) {
+                await this.handleLogout();
+            }
+        });
+
+        // 관리자 정보 표시
+        const adminName = document.querySelector('.admin-name');
+        const adminRole = document.querySelector('.admin-role');
+        if (adminName && this.currentUser) {
+            adminName.textContent = this.currentUser.name;
+            adminRole.textContent = this.currentUser.role === 'admin' ? 'Super Admin' : 'Moderator';
+        }
+    }
+
+    async handleLogout() {
+        try {
+            UI.showLoading('로그아웃 중...');
+            await authService.logout();
+            UI.hideLoading();
+            window.location.reload();
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    // ==================== 페이지 네비게이션 ====================
+    navigateTo(page) {
+        // 네비게이션 활성화
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.dataset.page === page) {
+                item.classList.add('active');
+            }
+        });
+
+        // 페이지 전환
+        document.querySelectorAll('.page-content').forEach(content => {
+            content.classList.remove('active');
+        });
+
+        const pageElement = document.getElementById(page);
+        if (pageElement) {
+            pageElement.classList.add('active');
+        }
+
+        // 페이지 타이틀 업데이트
+        const titles = {
+            'dashboard': '대시보드',
+            'media': '영화 관리',
+            'users': '사용자 관리',
+            'curators': '큐레이터 관리',
+            'shop': '상품 관리',
+            'orders': '주문 관리',
+            'support': '고객지원'
+        };
+
+        const pageTitle = document.querySelector('.page-title');
+        if (pageTitle) {
+            pageTitle.textContent = titles[page] || page;
+        }
+
+        this.currentPage = page;
+
+        // 페이지별 데이터 로드
+        this.loadPageData(page);
+    }
+
+    async loadPageData(page) {
+        switch (page) {
+            case 'dashboard':
+                await this.loadDashboard();
+                break;
+            case 'media':
+                await this.loadMovies();
+                break;
+            case 'users':
+                await this.loadUsers();
+                break;
+            case 'curators':
+                await this.loadCurators();
+                break;
+            case 'shop':
+                await this.loadProducts();
+                break;
+            case 'orders':
+                await this.loadOrders();
+                break;
+            case 'support':
+                await this.loadSupportTickets();
+                break;
+        }
+    }
+
+    // ==================== 대시보드 ====================
+    async loadDashboard() {
+        try {
+            UI.showLoading('대시보드 로딩 중...');
+            const data = await dashboardService.getStats();
+            UI.hideLoading();
+
+            // 통계 카드 업데이트
+            this.updateStatsCards(data.stats);
+
+            // 차트 업데이트
+            this.updateCharts(data.monthlyRevenue);
+
+            // 최근 주문 업데이트
+            this.updateRecentOrders(data.recentOrders);
+
+            // 인기 영화 업데이트
+            this.updateTopMovies(data.topMovies);
+
+            // 서버 상태 업데이트
+            this.updateServerStatus(data.serverStatus);
+
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    updateStatsCards(stats) {
+        document.querySelector('.stat-card:nth-child(1) .stat-value').textContent = 
+            stats.totalUsers.toLocaleString();
+        
+        document.querySelector('.stat-card:nth-child(2) .stat-value').textContent = 
+            stats.totalMembers.toLocaleString();
+        
+        document.querySelector('.stat-card:nth-child(3) .stat-value').textContent = 
+            `₩${(stats.totalRevenue / 1000000).toFixed(1)}M`;
+        
+        document.querySelector('.stat-card:nth-child(4) .stat-value').textContent = 
+            stats.totalMovies.toLocaleString();
+    }
+
+    updateCharts(monthlyData) {
+        const chartCanvas = document.getElementById('revenueChart');
+        if (!chartCanvas) return;
+
+        const ctx = chartCanvas.getContext('2d');
+        
+        // 기존 차트 제거
+        if (window.revenueChart) {
+            window.revenueChart.destroy();
+        }
+
+        // 데이터 변환
+        const labels = monthlyData.map(d => `${d._id.year}-${String(d._id.month).padStart(2, '0')}`);
+        const revenues = monthlyData.map(d => d.revenue);
+
+        window.revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: '월별 매출',
+                    data: revenues,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₩' + (value / 1000000).toFixed(1) + 'M';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    updateRecentOrders(orders) {
+        const tbody = document.querySelector('#recentOrdersTable tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = orders.slice(0, 5).map(order => `
+            <tr>
+                <td>${order.orderNumber}</td>
+                <td>${order.userId?.name || 'Unknown'}</td>
+                <td>₩${order.totalAmount.toLocaleString()}</td>
+                <td><span class="badge badge-${this.getOrderStatusClass(order.status)}">${this.getOrderStatusText(order.status)}</span></td>
+                <td>${new Date(order.createdAt).toLocaleDateString('ko-KR')}</td>
+            </tr>
+        `).join('');
+    }
+
+    updateTopMovies(movies) {
+        const container = document.querySelector('.top-movies-list');
+        if (!container) return;
+
+        container.innerHTML = movies.map((movie, index) => `
+            <div class="top-movie-item">
+                <span class="movie-rank">${index + 1}</span>
+                <img src="${movie.thumbnail}" alt="${movie.title}" class="movie-thumb">
+                <div class="movie-info">
+                    <h4>${movie.title}</h4>
+                    <p>${movie.viewCount.toLocaleString()} views</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    updateServerStatus(status) {
+        const container = document.querySelector('.server-status-grid');
+        if (!container) return;
+
+        container.innerHTML = Object.entries(status).map(([key, value]) => `
+            <div class="status-item">
+                <div class="status-header">
+                    <span class="status-name">${this.getServerName(key)}</span>
+                    <span class="status-badge status-${value.status}">${value.status}</span>
+                </div>
+                <div class="status-metric">${this.getServerMetric(key, value)}</div>
+            </div>
+        `).join('');
+    }
+
+    // ==================== 영화 관리 ====================
+    async loadMovies(params = {}) {
+        try {
+            UI.showLoading('영화 목록 로딩 중...');
+            const data = await movieService.getMovies({ page: 1, limit: 20, ...params });
+            UI.hideLoading();
+
+            this.renderMovieList(data.movies);
+            this.renderPagination(data.pagination, 'movies');
+
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    renderMovieList(movies) {
+        const tbody = document.querySelector('#moviesTable tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = movies.map(movie => `
+            <tr>
+                <td>
+                    <img src="${movie.thumbnail}" alt="${movie.title}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;">
+                </td>
+                <td>${movie.title}</td>
+                <td>${movie.director || '-'}</td>
+                <td>${movie.year || '-'}</td>
+                <td>${movie.viewCount.toLocaleString()}</td>
+                <td><span class="badge badge-${movie.quality === '4K' ? 'primary' : 'secondary'}">${movie.quality}</span></td>
+                <td><span class="badge badge-${this.getStatusClass(movie.status)}">${this.getStatusText(movie.status)}</span></td>
+                <td>
+                    <button class="btn-icon" onclick="app.editMovie('${movie._id}')" title="수정">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-icon" onclick="app.deleteMovie('${movie._id}')" title="삭제">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async deleteMovie(id) {
+        if (!await UI.confirm('이 영화를 삭제하시겠습니까?')) return;
+
+        try {
+            UI.showLoading('삭제 중...');
+            await movieService.deleteMovie(id);
+            UI.hideLoading();
+            UI.showToast('영화가 삭제되었습니다', 'success');
+            await this.loadMovies();
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    // ==================== 사용자 관리 ====================
+    async loadUsers(params = {}) {
+        try {
+            UI.showLoading('사용자 목록 로딩 중...');
+            const data = await userService.getUsers({ page: 1, limit: 20, ...params });
+            UI.hideLoading();
+
+            this.renderUserList(data.users);
+            this.renderPagination(data.pagination, 'users');
+
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    renderUserList(users) {
+        const tbody = document.querySelector('#usersTable tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = users.map(user => `
+            <tr>
+                <td>
+                    <img src="${user.avatar || 'https://via.placeholder.com/40'}" alt="${user.name}" 
+                         style="width:40px;height:40px;border-radius:50%;object-fit:cover;">
+                </td>
+                <td>${user.name}</td>
+                <td>${user.email}</td>
+                <td><span class="badge badge-${user.membershipStatus === 'active' ? 'success' : 'secondary'}">${user.membershipStatus}</span></td>
+                <td>${this.formatWatchTime(user.watchTime)}</td>
+                <td>${new Date(user.createdAt).toLocaleDateString('ko-KR')}</td>
+                <td>
+                    <button class="btn-icon" onclick="app.extendUserMembership('${user._id}')" title="멤버십 연장">
+                        <i class="fas fa-clock"></i>
+                    </button>
+                    <button class="btn-icon" onclick="app.promoteUserToCurator('${user._id}')" title="큐레이터 승격">
+                        <i class="fas fa-user-tie"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async extendUserMembership(userId) {
+        const duration = prompt('연장할 기간(일)을 입력하세요:', '30');
+        if (!duration) return;
+
+        try {
+            UI.showLoading('처리 중...');
+            await userService.extendMembership(userId, parseInt(duration));
+            UI.hideLoading();
+            UI.showToast('멤버십이 연장되었습니다', 'success');
+            await this.loadUsers();
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    // ==================== 큐레이터 관리 ====================
+    async loadCurators(params = {}) {
+        try {
+            UI.showLoading('큐레이터 목록 로딩 중...');
+            const data = await curatorService.getCurators({ page: 1, limit: 20, ...params });
+            UI.hideLoading();
+
+            this.renderCuratorList(data.curators);
+
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    renderCuratorList(curators) {
+        const container = document.querySelector('.curators-grid');
+        if (!container) return;
+
+        container.innerHTML = curators.map(curator => `
+            <div class="curator-card">
+                <div class="curator-header">
+                    <img src="${curator.userId?.avatar || 'https://via.placeholder.com/80'}" alt="${curator.userId?.name}">
+                    ${curator.isMonthlyFeatured ? '<span class="badge badge-star">⭐ 이달의 큐레이터</span>' : ''}
+                </div>
+                <h3>${curator.userId?.name}</h3>
+                <p class="curator-bio">${curator.bio || '-'}</p>
+                <div class="curator-stats">
+                    <div class="stat">
+                        <span class="stat-label">컬렉션</span>
+                        <span class="stat-value">${curator.collectionsCount}</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">팔로워</span>
+                        <span class="stat-value">${curator.followersCount.toLocaleString()}</span>
+                    </div>
+                </div>
+                <div class="curator-actions">
+                    <button class="btn-sm" onclick="app.setFeaturedCurator('${curator._id}')">
+                        ${curator.isMonthlyFeatured ? '지정 해제' : '이달의 큐레이터'}
+                    </button>
+                    <button class="btn-sm btn-danger" onclick="app.suspendCurator('${curator._id}')">
+                        정지
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async setFeaturedCurator(curatorId) {
+        try {
+            UI.showLoading('처리 중...');
+            await curatorService.setFeatured(curatorId);
+            UI.hideLoading();
+            UI.showToast('이달의 큐레이터가 지정되었습니다', 'success');
+            await this.loadCurators();
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    // ==================== 주문 관리 ====================
+    async loadOrders(params = {}) {
+        try {
+            UI.showLoading('주문 목록 로딩 중...');
+            const data = await orderService.getOrders({ page: 1, limit: 20, ...params });
+            UI.hideLoading();
+
+            this.renderOrderList(data.orders);
+
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    renderOrderList(orders) {
+        const tbody = document.querySelector('#ordersTable tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = orders.map(order => `
+            <tr>
+                <td>${order.orderNumber}</td>
+                <td>${order.userId?.name || '-'}</td>
+                <td>₩${order.totalAmount.toLocaleString()}</td>
+                <td><span class="badge badge-${this.getOrderStatusClass(order.status)}">${this.getOrderStatusText(order.status)}</span></td>
+                <td>${order.trackingNumber || '-'}</td>
+                <td>${new Date(order.createdAt).toLocaleDateString('ko-KR')}</td>
+                <td>
+                    <button class="btn-sm" onclick="app.updateOrderStatus('${order._id}')">상태 변경</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    async updateOrderStatus(orderId) {
+        const status = prompt('새로운 상태를 입력하세요 (pending/processing/shipped/delivered):', 'shipped');
+        if (!status) return;
+
+        const trackingNumber = status === 'shipped' ? prompt('송장번호를 입력하세요:') : null;
+
+        try {
+            UI.showLoading('처리 중...');
+            await orderService.updateStatus(orderId, { status, trackingNumber });
+            UI.hideLoading();
+            UI.showToast('주문 상태가 업데이트되었습니다', 'success');
+            await this.loadOrders();
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    // ==================== 고객 지원 ====================
+    async loadSupportTickets(params = {}) {
+        try {
+            UI.showLoading('티켓 목록 로딩 중...');
+            const data = await supportService.getTickets({ page: 1, limit: 20, ...params });
+            UI.hideLoading();
+
+            this.renderTicketList(data.tickets);
+
+        } catch (error) {
+            UI.hideLoading();
+            UI.showError(error);
+        }
+    }
+
+    renderTicketList(tickets) {
+        const tbody = document.querySelector('#ticketsTable tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = tickets.map(ticket => `
+            <tr>
+                <td>${ticket.ticketNumber}</td>
+                <td>${ticket.userId?.name || '-'}</td>
+                <td><span class="badge badge-${this.getTicketTypeClass(ticket.type)}">${this.getTicketTypeText(ticket.type)}</span></td>
+                <td>${ticket.subject}</td>
+                <td><span class="badge badge-${this.getTicketStatusClass(ticket.status)}">${this.getTicketStatusText(ticket.status)}</span></td>
+                <td>${new Date(ticket.createdAt).toLocaleDateString('ko-KR')}</td>
+                <td>
+                    <button class="btn-sm" onclick="app.viewTicket('${ticket._id}')">상세</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // ==================== 유틸리티 함수 ====================
+    renderPagination(pagination, context) {
+        // 페이지네이션 렌더링 구현
+        console.log('Pagination:', pagination);
+    }
+
+    getStatusClass(status) {
+        const map = { published: 'success', draft: 'warning', archived: 'secondary' };
+        return map[status] || 'secondary';
+    }
+
+    getStatusText(status) {
+        const map = { published: '게시됨', draft: '임시저장', archived: '보관됨' };
+        return map[status] || status;
+    }
+
+    getOrderStatusClass(status) {
+        const map = { pending: 'warning', processing: 'info', shipped: 'primary', delivered: 'success', cancelled: 'danger' };
+        return map[status] || 'secondary';
+    }
+
+    getOrderStatusText(status) {
+        const map = { pending: '대기', processing: '처리중', shipped: '배송중', delivered: '배송완료', cancelled: '취소됨' };
+        return map[status] || status;
+    }
+
+    getTicketTypeClass(type) {
+        const map = { inquiry: 'info', bug: 'danger', spoiler_report: 'warning' };
+        return map[type] || 'secondary';
+    }
+
+    getTicketTypeText(type) {
+        const map = { inquiry: '문의', bug: '버그', spoiler_report: '스포일러 신고' };
+        return map[type] || type;
+    }
+
+    getTicketStatusClass(status) {
+        const map = { open: 'warning', in_progress: 'info', resolved: 'success', closed: 'secondary' };
+        return map[status] || 'secondary';
+    }
+
+    getTicketStatusText(status) {
+        const map = { open: '열림', in_progress: '진행중', resolved: '해결됨', closed: '닫힘' };
+        return map[status] || status;
+    }
+
+    getServerName(key) {
+        const map = { api: 'API Server', streaming: 'Streaming', database: 'Database', cdn: 'CDN' };
+        return map[key] || key;
+    }
+
+    getServerMetric(key, value) {
+        if (key === 'api') return `${value.responseTime}ms`;
+        if (key === 'streaming') return `${value.bandwidth}% bandwidth`;
+        if (key === 'database') return `${value.connections} connections`;
+        if (key === 'cdn') return `${value.hitRate}% hit rate`;
+        return '-';
+    }
+
+    formatWatchTime(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        return `${hours}h`;
+    }
+}
+
+// ==================== 앱 시작 ====================
+let app;
+
+document.addEventListener('DOMContentLoaded', () => {
+    app = new MovieLabAdminApp();
+});
+
+// 전역으로 export
+window.app = app;
+    </script>
+</body>
+</html>
