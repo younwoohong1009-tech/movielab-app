@@ -10,6 +10,7 @@ const curatorController = require('../controllers/curatorController');
 const orderController = require('../controllers/orderController');
 const supportController = require('../controllers/supportController');
 const uploadController = require('../controllers/uploadController');
+const aiWritingController = require('../controllers/aiWritingController');
 
 // 모든 라우트에 인증 & 관리자 권한 적용
 router.use(protect);
@@ -120,5 +121,12 @@ router.post('/upload/multiple', uploadController.uploadMultiple);
 router.post('/upload/chunk', uploadController.uploadChunk);
 router.delete('/upload/:filename', uploadController.deleteFile);
 router.get('/upload/list', uploadController.listFiles);
+
+// ===================
+// AI Writing Routes
+// ===================
+router.post('/ai-writing/synopsis', aiWritingController.generateSynopsis);
+router.post('/ai-writing/review', aiWritingController.generateReview);
+router.put('/ai-writing/save/:movieId', aiWritingController.saveToMovie);
 
 module.exports = router;

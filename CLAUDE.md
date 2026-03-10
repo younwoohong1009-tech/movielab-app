@@ -269,6 +269,61 @@ No build step is needed — the frontend is pre-built static HTML.
 
 ---
 
+## AI Writing Automation
+
+The `ai-writing` feature auto-generates Korean synopsis and review text using the Claude API.
+
+### New Files & Changes
+
+| File | Change |
+|------|--------|
+| `controllers/aiWritingController.js` | New controller — Claude API calls with SSE streaming |
+| `routes/admin.js` | Three new routes under `/api/admin/ai-writing/*` |
+| `public/index.html` | New nav item, page section, `AiWritingService`, `api.streamPost()` |
+
+### Environment Variable
+
+`ANTHROPIC_API_KEY` is required. Add it alongside the other env vars before deploying.
+
+### New API Routes
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/admin/ai-writing/synopsis` | Stream synopsis generation |
+| POST | `/api/admin/ai-writing/review` | Stream review generation |
+| PUT | `/api/admin/ai-writing/save/:movieId` | Save synopsis to movie record |
+
+**Request body (synopsis / review):**
+```json
+{ "movieId": "<mongo-id>" }
+{ "movieId": "<mongo-id>", "reviewStyle": "curator|critical|editorial" }
+```
+Both endpoints also accept `movieData` (a raw object) instead of `movieId` for unsaved movies.
+
+**Streaming response format (SSE):**
+```
+data: {"text":"생성된 텍스트 청크"}
+data: [DONE]
+```
+
+### Model & Prompting
+
+- Model: `claude-opus-4-6` with `thinking: { type: "adaptive" }` (streaming)
+- `max_tokens`: 1024 for synopsis, 2048 for reviews
+- Prompts are built in `buildSynopsisPrompt()` / `buildReviewPrompt()` inside the controller
+- Korean output, targeted at art-house/independent film audiences
+
+### Frontend Streaming
+
+`ApiClient.streamPost(endpoint, data, { onChunk, onDone, onError })` reads the
+SSE stream via `fetch` + `ReadableStream`. Text chunks are appended directly to
+the output `<textarea>` in real time.
+
+Only synopsis output can be saved directly to the movie's `synopsis` field via the
+"영화에 저장" button. Review text is copy-only.
+
+---
+
 ## What Does Not Exist (and Should Not Be Added Without Discussion)
 
 - **No automated test suite** — there are no unit, integration, or E2E tests.
