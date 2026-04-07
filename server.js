@@ -11,6 +11,7 @@ const connectDB = require('./config/database');
 // Routes
 const authRoutes = require('./routes/auth');
 const adminRoutes = require('./routes/admin');
+const alphabetRoutes = require('./alphabet-drop/routes/alphabet');
 
 // Express app
 const app = express();
@@ -31,12 +32,16 @@ app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 // 정적 파일 제공 (프론트엔드)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Alphabet Drop 정적 파일
+app.use('/drop', express.static(path.join(__dirname, 'alphabet-drop', 'public')));
+
 // 업로드 파일 제공
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/alphabet', alphabetRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -72,6 +77,8 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌐 Port: ${PORT}`);
   console.log(`🏥 Health: /api/health`);
   console.log(`📱 Frontend: /`);
+  console.log(`💣 Alphabet Drop: /drop/drop.html`);
+  console.log(`📡 Alphabet API: /api/alphabet/*`);
   console.log('='.repeat(60));
   console.log('');
 });
