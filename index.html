@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WELCOME TO ALPHABET LIFE — 알파벳카드 신상품 8종 런칭</title>
+
+<!-- Google Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+<!-- GSAP + ScrollTrigger CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+<style>
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: auto; overflow-x: hidden; }
+
+body {
+  font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== 1. INTRO SECTION ===== */
+#intro {
+  position: relative;
+  width: 100%; height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: #000;
+  z-index: 10;
+}
+
+.intro-title {
+  font-family: 'Oswald', 'Impact', sans-serif;
+  font-weight: 700;
+  font-size: clamp(3rem, 8vw, 7.5rem);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  line-height: 1.08;
+  text-align: center;
+  color: #fff;
+  will-change: transform, opacity;
+}
+
+/* ===== 2. KEY VISUAL SECTION ===== */
+#keyvisual {
+  position: relative;
+  width: 100%; height: 100vh;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.keyvisual-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  overflow: hidden;
+}
+
+.keyvisual-bg {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  /* ★ 실제 황야 배경 이미지 교체: url('실제_이미지.jpg') ★ */
+  background-image: url('https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=2400&q=85');
+  background-size: cover;
+  background-position: center center;
+  transform-origin: 72% 85%;
+  will-change: transform;
+}
+
+.keyvisual-bg::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+
+.keyvisual-text {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2; text-align: center;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.keyvisual-text h2 {
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 900;
+  font-size: clamp(1.4rem, 3.5vw, 3rem);
+  letter-spacing: 0.06em;
+  color: #fff;
+  text-shadow: 0 2px 30px rgba(0,0,0,0.85), 0 0 80px rgba(0,0,0,0.6);
+  line-height: 1.5;
+}
+
+.keyvisual-fade {
+  position: absolute; inset: 0;
+  background: #000; opacity: 0;
+  z-index: 3; pointer-events: none;
+  will-change: opacity;
+}
+
+/* ===== 3. IMMIGRATION COUNTER ===== */
+#immigration {
+  position: relative; width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #000 0%, #0a0a12 30%, #10101c 100%);
+  z-index: 8;
+  padding: 120px 5vw 100px;
+  display: flex; flex-direction: column; align-items: center;
+}
+
+.imm-deco {
+  width: 100%; max-width: 800px;
+  text-align: center; margin-bottom: 60px;
+}
+
+.imm-deco .deco-line {
+  width: 60px; height: 2px;
+  background: rgba(255,255,255,0.15);
+  margin: 0 auto 36px;
+}
+
+.imm-copy {
+  opacity: 0; transform: translateY(30px);
+  will-change: transform, opacity;
+}
+
+.imm-copy p {
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  font-weight: 300; line-height: 2;
+  color: rgba(255,255,255,0.8);
+  letter-spacing: 0.03em;
+}
+
+.imm-copy p strong { font-weight: 700; color: #fff; }
+
+/* ---- Card Grid ---- */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 28px;
+  max-width: 960px; width: 100%;
+  margin-top: 60px;
+}
+
+@media (max-width: 860px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+}
+
+@media (max-width: 480px) {
+  .card-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+
+/* ===== Card Plate ===== */
+.card-plate {
+  aspect-ratio: 0.628;
+  border-radius: 16px;
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  transform: translateY(60px);
+  opacity: 0;
+  will-change: transform, opacity, box-shadow;
+  transition: transform 0.35s cubic-bezier(.25,.8,.25,1), box-shadow 0.35s ease;
+}
+
+.card-plate::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  pointer-events: none; z-index: 4;
+}
+
+/* Card artwork SVG fills entire card */
+.card-plate .card-art {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+
+/* Hyundai Card brand badge */
+.card-brand-badge {
+  position: absolute;
+  top: 7%; left: 7%;
+  z-index: 5;
+  padding: 3px 8px;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  border-radius: 5px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: clamp(6px, 1.5vw, 9px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.85);
+  pointer-events: none;
+  line-height: 1.4;
+}
+
+/* IC Chip */
+.card-chip-icon {
+  position: absolute;
+  top: 12%; left: 50%;
+  transform: translateX(-50%);
+  width: clamp(22px, 5vw, 34px);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Hover */
+.card-plate:hover {
+  transform: translateY(-8px) scale(1.03) !important;
+  box-shadow:
+    0 0 25px rgba(255,255,255,0.12),
+    0 0 60px rgba(120,140,255,0.08),
+    0 20px 60px rgba(0,0,0,0.5);
+}
+
+.card-plate:hover::before {
+  border-color: rgba(180,200,255,0.25);
+  box-shadow: inset 0 0 30px rgba(180,200,255,0.06);
+}
+
+/* ===== POPUP OVERLAY ===== */
+.card-overlay {
+  position: fixed; inset: 0;
+  z-index: 9999;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none; opacity: 0;
+}
+
+.card-overlay.active { pointer-events: auto; opacity: 1; }
+
+.card-overlay-bg {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.card-popup {
+  position: relative; z-index: 2;
+  width: min(320px, 75vw);
+  aspect-ratio: 0.628;
+  border-radius: 20px;
+  overflow: hidden;
+  transform: scale(0.6) rotateY(15deg);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.card-popup .card-art {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  display: block;
+}
+
+.card-popup .card-brand-badge {
+  position: absolute;
+  top: 7%; left: 7%;
+  z-index: 5;
+  padding: 4px 10px;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  border-radius: 5px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(255,255,255,0.85);
+  pointer-events: none;
+}
+
+.card-popup .card-chip-icon {
+  position: absolute;
+  top: 12%; left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* Stamp */
+.stamp {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(3) rotate(-15deg);
+  opacity: 0; z-index: 10;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.stamp-inner {
+  width: 170px; height: 170px;
+  border: 5px solid #ff3333;
+  border-radius: 50%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: #ff3333;
+  text-transform: uppercase;
+  font-family: 'Oswald', sans-serif;
+  position: relative;
+}
+
+.stamp-inner::before {
+  content: '';
+  position: absolute; inset: 6px;
+  border: 2px solid #ff3333;
+  border-radius: 50%;
+}
+
+.stamp-text-main { font-size: 22px; font-weight: 700; letter-spacing: 0.15em; }
+.stamp-text-sub { font-size: 10px; font-weight: 500; letter-spacing: 0.2em; margin-top: 2px; }
+.stamp-text-date { font-size: 9px; font-weight: 400; margin-top: 6px; letter-spacing: 0.1em; color: #ff5555; }
+
+/* Light burst */
+.light-burst {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 600px; height: 600px;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0; z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255,220,100,0.4) 0%, rgba(255,180,60,0.1) 30%, transparent 60%);
+  border-radius: 50%;
+  will-change: transform, opacity;
+}
+
+/* Particles */
+.particles-container {
+  position: absolute; inset: 0;
+  z-index: 5; pointer-events: none; overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  opacity: 0;
+}
+
+/* Close */
+.popup-close {
+  position: absolute; top: 30px; right: 30px;
+  z-index: 20;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.05);
+  color: #fff; font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+.popup-close:hover { background: rgba(255,255,255,0.15); }
+
+/* Footer */
+#footer {
+  text-align: center;
+  padding: 60px 20px 40px;
+  background: #0a0a12;
+  color: rgba(255,255,255,0.25);
+  font-size: 12px;
+  letter-spacing: 0.05em;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Hidden SVG defs for shared gradients -->
+<svg style="position:absolute;width:0;height:0;" aria-hidden="true">
+  <defs>
+    <linearGradient id="chipGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d4b85c"/>
+      <stop offset="45%" stop-color="#f0e0a0"/>
+      <stop offset="100%" stop-color="#b08a2e"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- ============================================
+     SECTION 1: INTRO
+============================================= -->
+<section id="intro">
+  <h1 class="intro-title">WELCOME TO<br>ALPHABET LIFE</h1>
+</section>
+
+<!-- ============================================
+     SECTION 2: KEY VISUAL — 황야 줌인
+============================================= -->
+<section id="keyvisual">
+  <div class="keyvisual-inner">
+    <div class="keyvisual-bg"></div>
+    <div class="keyvisual-text">
+      <h2>"알파벳 세상으로 넘어가는<br>출입국 사무소"</h2>
+    </div>
+    <div class="keyvisual-fade"></div>
+  </div>
+</section>
+
+<!-- ============================================
+     SECTION 3: IMMIGRATION COUNTER
+============================================= -->
+<section id="immigration">
+  <div class="imm-deco">
+    <div class="deco-line"></div>
+    <div class="imm-copy imm-copy-1">
+      <p>새로운 알파벳 세상에 도착한 사람들에게</p>
+    </div>
+    <div class="imm-copy imm-copy-2">
+      <p><strong>알파벳 카드</strong>가 내 취향을 증명하는 카드가 되어</p>
+    </div>
+    <div class="imm-copy imm-copy-3">
+      <p>저마다의 라이프 혜택 안으로 들어가는 <strong>개별 스토리</strong></p>
+    </div>
+  </div>
+
+  <div class="card-grid" id="cardGrid"></div>
+</section>
+
+<!-- ===== POPUP OVERLAY ===== -->
+<div class="card-overlay" id="cardOverlay">
+  <div class="card-overlay-bg"></div>
+  <button class="popup-close" id="popupClose">&times;</button>
+  <div class="card-popup" id="cardPopup"></div>
+  <div class="stamp" id="stamp">
+    <div class="stamp-inner">
+      <span class="stamp-text-main">APPROVED</span>
+      <span class="stamp-text-sub">출입 승인</span>
+      <span class="stamp-text-date">2026.04.10</span>
+    </div>
+  </div>
+  <div class="light-burst" id="lightBurst"></div>
+  <div class="particles-container" id="particles"></div>
+</div>
+
+<footer id="footer">
+  <p>WELCOME TO ALPHABET LIFE &mdash; Hyundai Card Alphabet Series</p>
+</footer>
+
+<script>
+/* =========================================================
+   카드 데이터 — SVG 아트워크 정의
+   ★ 실제 카드 이미지로 교체 시:
+     각 카드의 svg 프로퍼티를 제거하고,
+     img 프로퍼티를 추가하세요. 예:
+     { letter:'D', img:'card-d.png' }
+     그 후 buildCardHTML 함수에서 <img> 태그로 렌더링.
+========================================================= */
+const CARDS = [
+  {
+    letter: 'D',
+    bg: '#2b2d7b',
+    fg: '#f5b731',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#2b2d7b"/>
+      <path d="M 90 28 L 90 450 L 165 450 C 258 450, 268 365, 268 239 C 268 113, 258 28, 165 28 Z" fill="#f5b731"/>
+    </svg>`
+  },
+  {
+    letter: 'H',
+    bg: '#1c1c5e',
+    fg: '#e85d2a',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#1c1c5e"/>
+      <rect x="45" y="0" width="80" height="478" fill="#e85d2a"/>
+      <rect x="175" y="0" width="80" height="478" fill="#e85d2a"/>
+      <rect x="45" y="185" width="210" height="108" fill="#e85d2a"/>
+    </svg>`
+  },
+  {
+    letter: 'O',
+    bg: '#6cb8e6',
+    fg: '#4a5e1a',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#6cb8e6"/>
+      <ellipse cx="150" cy="260" rx="128" ry="195" fill="#4a5e1a"/>
+    </svg>`
+  },
+  {
+    letter: 'S',
+    bg: '#f03c14',
+    fg: '#7dd6a0',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#f03c14"/>
+      <ellipse cx="185" cy="115" rx="162" ry="142" fill="#7dd6a0"/>
+      <ellipse cx="115" cy="365" rx="162" ry="142" fill="#7dd6a0"/>
+      <ellipse cx="55" cy="90" rx="112" ry="105" fill="#f03c14"/>
+      <ellipse cx="245" cy="390" rx="112" ry="105" fill="#f03c14"/>
+    </svg>`
+  },
+  {
+    letter: 'T',
+    bg: '#1a7a8a',
+    fg: '#c4956a',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#1a7a8a"/>
+      <rect x="0" y="0" width="300" height="165" fill="#c4956a"/>
+      <rect x="85" y="165" width="130" height="313" fill="#c4956a"/>
+    </svg>`
+  },
+  {
+    letter: 'B',
+    bg: '#f5b731',
+    fg: '#e82e1e',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#f5b731"/>
+      <path d="M 42 12 L 42 232 L 145 232 C 222 232, 248 192, 248 130 C 248 60, 210 12, 145 12 Z" fill="#e82e1e"/>
+      <path d="M 42 248 L 42 466 L 155 466 C 240 466, 265 420, 265 360 C 265 296, 228 248, 155 248 Z" fill="#e82e1e"/>
+    </svg>`
+  },
+  {
+    letter: 'P',
+    bg: '#38d4d4',
+    fg: '#5a1a3a',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#38d4d4"/>
+      <rect x="55" y="75" width="65" height="390" fill="#5a1a3a"/>
+      <path d="M 120 75 L 120 285 C 205 285, 255 250, 255 180 C 255 110, 205 75, 120 75 Z" fill="#5a1a3a"/>
+    </svg>`
+  },
+  {
+    letter: 'R',
+    bg: '#e838ef',
+    fg: '#33cc33',
+    svg: `<svg class="card-art" viewBox="0 0 300 478" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="300" height="478" fill="#e838ef"/>
+      <rect x="50" y="55" width="65" height="400" fill="#33cc33"/>
+      <path d="M 115 55 L 115 265 C 200 265, 252 228, 252 160 C 252 92, 200 55, 115 55 Z" fill="#33cc33"/>
+      <polygon points="135,265 262,455 192,455 115,300" fill="#33cc33"/>
+    </svg>`
+  }
+];
+
+/* IC chip SVG template */
+function chipSVG() {
+  return `<svg class="card-chip-icon" viewBox="0 0 50 38" xmlns="http://www.w3.org/2000/svg">
+    <rect width="50" height="38" rx="5" fill="url(#chipGrad)"/>
+    <line x1="25" y1="0" x2="25" y2="38" stroke="#b08a2e" stroke-width="0.7" opacity="0.45"/>
+    <line x1="0" y1="14" x2="50" y2="14" stroke="#b08a2e" stroke-width="0.7" opacity="0.45"/>
+    <line x1="0" y1="24" x2="50" y2="24" stroke="#b08a2e" stroke-width="0.7" opacity="0.45"/>
+    <rect x="17" y="10" width="16" height="18" rx="2" stroke="#b08a2e" stroke-width="0.8" fill="none" opacity="0.4"/>
+  </svg>`;
+}
+
+/* Build card HTML */
+function buildCardHTML(card, isPopup) {
+  return `
+    ${card.svg}
+    <span class="card-brand-badge">Hyundai Card</span>
+    ${chipSVG()}
+  `;
+}
+
+/* Render card grid */
+const gridEl = document.getElementById('cardGrid');
+CARDS.forEach((card, i) => {
+  const plate = document.createElement('div');
+  plate.className = 'card-plate';
+  plate.setAttribute('data-letter', card.letter);
+  plate.setAttribute('data-index', i);
+  plate.innerHTML = buildCardHTML(card, false);
+  gridEl.appendChild(plate);
+});
+
+/* =========================================================
+   GSAP + ScrollTrigger
+========================================================= */
+gsap.registerPlugin(ScrollTrigger);
+
+/* 1. INTRO — Scale-up + Fade-out */
+gsap.to('.intro-title', {
+  scale: 1.25,
+  opacity: 0,
+  ease: 'power2.inOut',
+  scrollTrigger: {
+    trigger: '#intro',
+    start: 'top top',
+    end: 'bottom top',
+    scrub: 1,
+  }
+});
+
+/* 2. KEY VISUAL — 황야 줌인 */
+const kvTL = gsap.timeline({
+  scrollTrigger: {
+    trigger: '#keyvisual',
+    start: 'top top',
+    end: '+=3500',
+    scrub: 1.2,
+    pin: true,
+    anticipatePin: 1,
+  }
+});
+
+kvTL.to('.keyvisual-bg', { scale: 12, ease: 'power1.in', duration: 1 }, 0);
+kvTL.to('.keyvisual-text', { opacity: 0, scale: 0.85, ease: 'power2.in', duration: 0.3 }, 0);
+kvTL.to('.keyvisual-fade', { opacity: 1, ease: 'power2.in', duration: 0.35 }, 0.65);
+
+/* 3. IMMIGRATION — copy + cards */
+document.querySelectorAll('.imm-copy').forEach((el, i) => {
+  gsap.to(el, {
+    opacity: 1, y: 0, duration: 1,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none reverse' },
+    delay: i * 0.15,
+  });
+});
+
+gsap.to('.card-plate', {
+  opacity: 1, y: 0, duration: 0.8,
+  ease: 'back.out(1.4)',
+  stagger: 0.1,
+  scrollTrigger: { trigger: '.card-grid', start: 'top 80%', toggleActions: 'play none none reverse' }
+});
+
+/* =========================================================
+   4. CARD POPUP
+========================================================= */
+const overlay    = document.getElementById('cardOverlay');
+const popup      = document.getElementById('cardPopup');
+const stampEl    = document.getElementById('stamp');
+const lightEl    = document.getElementById('lightBurst');
+const particlesC = document.getElementById('particles');
+const closeBtn   = document.getElementById('popupClose');
+
+const particleColors = ['#ff3333','#f5a623','#4a8bc2','#3a7d44','#d946ef','#e6b800','#fff','#7c3aed'];
+
+function createParticles() {
+  particlesC.innerHTML = '';
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.background = particleColors[Math.floor(Math.random() * particleColors.length)];
+    const size = (3 + Math.random() * 6) + 'px';
+    p.style.width = size;
+    p.style.height = size;
+    particlesC.appendChild(p);
+  }
+}
+
+function openCard(cardIndex) {
+  const card = CARDS[cardIndex];
+  popup.innerHTML = buildCardHTML(card, true);
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  createParticles();
+
+  const tl = gsap.timeline();
+  tl.to(overlay, { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0);
+  tl.to(popup, { scale: 1, rotateY: 0, opacity: 1, duration: 0.7, ease: 'back.out(1.7)' }, 0.15);
+  tl.to(lightEl, { scale: 1.2, opacity: 1, duration: 0.5, ease: 'power2.out' }, 0.6);
+  tl.to(lightEl, { scale: 1.8, opacity: 0, duration: 0.8, ease: 'power2.in' }, 1.1);
+  tl.to(stampEl, {
+    scale: 1, rotate: -15, opacity: 1,
+    duration: 0.35, ease: 'back.out(3)',
+    transformOrigin: '50% 50%',
+  }, 0.85);
+
+  particlesC.querySelectorAll('.particle').forEach(p => {
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 120 + Math.random() * 250;
+    tl.to(p, { x: Math.cos(angle) * dist, y: Math.sin(angle) * dist, opacity: 1, duration: 0.15, ease: 'power2.out' }, 0.85);
+    tl.to(p, { opacity: 0, duration: 0.6 + Math.random() * 0.4, ease: 'power2.in' }, 1.05);
+  });
+}
+
+function closeCard() {
+  const tl = gsap.timeline({
+    onComplete: () => {
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      gsap.set(popup, { scale: 0.6, rotateY: 15, opacity: 0 });
+      gsap.set(stampEl, { scale: 3, rotate: -15, opacity: 0 });
+      gsap.set(lightEl, { scale: 0, opacity: 0 });
+    }
+  });
+  tl.to(stampEl, { opacity: 0, duration: 0.25 }, 0);
+  tl.to(popup, { scale: 0.7, opacity: 0, duration: 0.35, ease: 'power2.in' }, 0);
+  tl.to(overlay, { opacity: 0, duration: 0.35, ease: 'power2.in' }, 0.1);
+}
+
+/* Event binding */
+document.querySelectorAll('.card-plate').forEach(card => {
+  card.addEventListener('click', () => openCard(parseInt(card.getAttribute('data-index'))));
+});
+
+closeBtn.addEventListener('click', closeCard);
+document.querySelector('.card-overlay-bg').addEventListener('click', closeCard);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && overlay.classList.contains('active')) closeCard();
+});
+</script>
+</body>
+</html>
