@@ -18,11 +18,24 @@ body{font-family:'Noto Sans KR',sans-serif;background:#000;color:#fff;overflow-x
 /* <!-- BG1: 황야 사막 배경 --> */
 .bg-desert{background-image:url('https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=2400&q=85');transform-origin:65% 80%}
 .bg-desert::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,.5)100%)}
-/* <!-- BG2: 웨스턴풍 나무 오두막 외관 --> */
-.bg-exterior{background-image:url('https://images.unsplash.com/photo-1504701954957-2010ec3bcec1?w=2400&q=85');transform-origin:50% 55%;opacity:0}
-/* <!-- BG3: 어두운 빈티지 나무 판자 벽면 --> */
-.bg-interior{background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=2400&q=85');opacity:0}
-.bg-interior::after{content:'';position:absolute;inset:0;background:rgba(5,3,0,.75)}
+/* <!-- BG2: 웨스턴풍 나무 오두막 외관 — 실제 이미지로 교체: background-image:url('오두막외관.jpg') --> */
+.bg-exterior{
+  background:
+    repeating-linear-gradient(90deg,transparent 0px,transparent 56px,rgba(0,0,0,.35) 56px,rgba(0,0,0,.35) 58px),
+    repeating-linear-gradient(180deg,transparent 0px,transparent 200px,rgba(0,0,0,.08) 200px,rgba(0,0,0,.08) 201px),
+    linear-gradient(170deg,#b8956a 0%,#9c7044 25%,#7a5230 55%,#6b4226 80%,#5a3820 100%);
+  transform-origin:50% 55%;opacity:0
+}
+.bg-exterior::after{content:'ALPHABET IMMIGRATION';position:absolute;top:28%;left:50%;transform:translateX(-50%);font-family:'Oswald',sans-serif;font-size:clamp(2rem,5vw,4.5rem);font-weight:700;letter-spacing:.12em;color:rgba(255,255,255,.85);text-shadow:0 2px 20px rgba(0,0,0,.6);white-space:nowrap;padding:16px 40px;border:3px solid rgba(255,255,255,.3);background:rgba(60,35,15,.7)}
+/* <!-- BG3: 어두운 빈티지 나무 판자 벽면 — 실제 이미지로 교체: background-image:url('나무벽면.jpg') --> */
+.bg-interior{
+  background:
+    repeating-linear-gradient(90deg,transparent 0px,transparent 52px,rgba(0,0,0,.5) 52px,rgba(0,0,0,.5) 54px),
+    repeating-linear-gradient(180deg,transparent 0px,transparent 6px,rgba(0,0,0,.06) 6px,rgba(0,0,0,.06) 7px),
+    linear-gradient(180deg,#1a0f08 0%,#2a1810 40%,#1f1209 70%,#150c06 100%);
+  opacity:0
+}
+.bg-interior::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(40,25,10,.3),rgba(0,0,0,.6))}
 .cin-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;text-align:center;pointer-events:none}
 .cin-text h2{font-weight:900;font-size:clamp(1.3rem,3.2vw,2.8rem);letter-spacing:.05em;color:#fff;text-shadow:0 2px 30px rgba(0,0,0,.85),0 0 80px rgba(0,0,0,.6);line-height:1.6}
 .cin-black{position:absolute;inset:0;background:#000;opacity:0;z-index:3;pointer-events:none}
